@@ -64,3 +64,14 @@ test("can use local import alias", async () => {
     custom(data, ["foo", "bar", "baz", "last"]);
     `);
 });
+
+test("does not touch oc() calls if they are not imported from ts-optchain", async () => {
+    const code = dedent`
+    oc(data).foo.bar.baz.last();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    oc(data).foo.bar.baz.last();
+    `);
+});
