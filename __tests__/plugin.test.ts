@@ -38,3 +38,16 @@ test("can pass the default value", async () => {
     getOC(data, ["foo", "bar", "baz", "last"], "default");
     `);
 });
+
+test("can handle complicated expressions in default values", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar.baz.last(something ? getDefault() : other());
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "ts-optchain";
+    getOC(data, ["foo", "bar", "baz", "last"], something ? getDefault() : other());
+    `);
+});
