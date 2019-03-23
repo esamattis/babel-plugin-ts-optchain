@@ -1,17 +1,29 @@
 import * as types from "@babel/types";
 import {Visitor, NodePath} from "@babel/traverse";
 
+type CallValue = types.CallExpression["arguments"][0];
+
 function getMemberExpressionPath(
     t: typeof types,
     path: NodePath,
     memberPath?: string[],
-): {memberPath: string[]; startPath: NodePath} {
+): {memberPath: string[]; startPath: NodePath; defaultValue?: CallValue} {
     if (!memberPath) {
         memberPath = [];
     }
 
     if (!t.isMemberExpression(path.container)) {
-        return {memberPath, startPath: path.parentPath};
+        let defaultValue: CallValue | undefined = undefined;
+
+        if (t.isCallExpression(path.parent)) {
+            defaultValue = path.parent.arguments[0];
+        }
+
+        return {
+            memberPath,
+            startPath: path.parentPath,
+            defaultValue: defaultValue,
+        };
     }
 
     return getMemberExpressionPath(
@@ -31,18 +43,23 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
                     return;
                 }
 
-                const {memberPath, startPath} = getMemberExpressionPath(
-                    t,
-                    path,
-                );
+                const {
+                    memberPath,
+                    startPath,
+                    defaultValue,
+                } = getMemberExpressionPath(t, path);
+
+                const callArgs = [
+                    path.node.arguments[0],
+                    t.arrayExpression(memberPath.map(p => t.stringLiteral(p))),
+                ];
+
+                if (defaultValue) {
+                    callArgs.push(defaultValue);
+                }
 
                 startPath.replaceWith(
-                    t.callExpression(t.identifier("getOC"), [
-                        path.node.arguments[0],
-                        t.arrayExpression(
-                            memberPath.map(p => t.stringLiteral(p)),
-                        ),
-                    ]),
+                    t.callExpression(t.identifier("getOC"), callArgs),
                 );
             },
         },

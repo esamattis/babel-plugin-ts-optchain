@@ -25,3 +25,16 @@ test("can transform property access to getOC call", async () => {
     getOC(data, ["foo", "bar", "baz", "last"]);
     `);
 });
+
+test("can pass the default value", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar.baz.last("default");
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "ts-optchain";
+    getOC(data, ["foo", "bar", "baz", "last"], "default");
+    `);
+});
