@@ -6,10 +6,10 @@ type CallValue = types.CallExpression["arguments"][0];
 function getMemberExpressionPath(
     t: typeof types,
     path: NodePath,
-    memberPath?: string[],
-): {memberPath: string[]; startPath: NodePath; defaultValue?: CallValue} {
-    if (!memberPath) {
-        memberPath = [];
+    properties?: string[],
+): {properties: string[]; startPath: NodePath; defaultValue?: CallValue} {
+    if (!properties) {
+        properties = [];
     }
 
     if (!t.isMemberExpression(path.container)) {
@@ -20,7 +20,7 @@ function getMemberExpressionPath(
         }
 
         return {
-            memberPath,
+            properties: properties,
             startPath: path.parentPath,
             defaultValue: defaultValue,
         };
@@ -29,7 +29,7 @@ function getMemberExpressionPath(
     return getMemberExpressionPath(
         t,
         path.parentPath,
-        memberPath.concat(path.container.property.name),
+        properties.concat(path.container.property.name),
     );
 }
 
@@ -41,8 +41,6 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
     return {
         visitor: {
             ImportDeclaration(path) {
-                // path.node.specifiers[0].local.name
-                // path.node.specifiers[0].imported.name
                 if (path.node.source.value !== "ts-optchain") {
                     return;
                 }
@@ -59,6 +57,10 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
             },
 
             CallExpression(path) {
+                if (!name) {
+                    return;
+                }
+
                 if (!t.isIdentifier(path.node.callee, {name: name})) {
                     return;
                 }
@@ -71,7 +73,7 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
                 }
 
                 const {
-                    memberPath,
+                    properties: memberPath,
                     startPath,
                     defaultValue,
                 } = getMemberExpressionPath(t, path);
