@@ -1,0 +1,24 @@
+{
+    "name": "babel-plugin-ts-optchain",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@babel/core": "^7.4.0",
+        "@babel/traverse": "^7.4.0",
+        "@babel/types": "^7.4.0",
+        "@types/babel__traverse": "^7.0.6",
+        "@types/dedent": "^0.7.0",
+        "@types/jest": "^24.0.11",
+        "dedent": "^0.7.0",
+        "jest": "^24.5.0",
+        "prettier": "^1.16.4",
+        "ts-jest": "^24.0.0",
+        "typescript": "^3.3.4000"
+    }
+}
