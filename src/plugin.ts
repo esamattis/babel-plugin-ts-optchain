@@ -43,6 +43,13 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
                     return;
                 }
 
+                // Avoid infinite recursion on already changed nodes
+                if (t.isCallExpression(path.node)) {
+                    if (path.node.arguments.length > 1) {
+                        return;
+                    }
+                }
+
                 const {
                     memberPath,
                     startPath,
@@ -59,7 +66,7 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
                 }
 
                 startPath.replaceWith(
-                    t.callExpression(t.identifier("getOC"), callArgs),
+                    t.callExpression(path.node.callee, callArgs),
                 );
             },
         },

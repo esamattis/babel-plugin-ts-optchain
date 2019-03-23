@@ -13,7 +13,7 @@ function runPlugin(code: string) {
     return res;
 }
 
-test("can transform property access to getOC call", async () => {
+test("can transform property access to oc call", async () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar.baz.last();
@@ -22,7 +22,7 @@ test("can transform property access to getOC call", async () => {
     const res = runPlugin(code);
     expect(res.code).toEqual(dedent`
     import { oc } from "ts-optchain";
-    getOC(data, ["foo", "bar", "baz", "last"]);
+    oc(data, ["foo", "bar", "baz", "last"]);
     `);
 });
 
@@ -35,7 +35,7 @@ test("can pass the default value", async () => {
     const res = runPlugin(code);
     expect(res.code).toEqual(dedent`
     import { oc } from "ts-optchain";
-    getOC(data, ["foo", "bar", "baz", "last"], "default");
+    oc(data, ["foo", "bar", "baz", "last"], "default");
     `);
 });
 
@@ -48,6 +48,6 @@ test("can handle complicated expressions in default values", async () => {
     const res = runPlugin(code);
     expect(res.code).toEqual(dedent`
     import { oc } from "ts-optchain";
-    getOC(data, ["foo", "bar", "baz", "last"], something ? getDefault() : other());
+    oc(data, ["foo", "bar", "baz", "last"], something ? getDefault() : other());
     `);
 });
