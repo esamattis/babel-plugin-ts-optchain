@@ -36,10 +36,30 @@ function getMemberExpressionPath(
 export default function(babel: {types: typeof types}): Record<string, Visitor> {
     const {types: t} = babel;
 
+    let name: string | null = null;
+
     return {
         visitor: {
+            ImportDeclaration(path) {
+                // path.node.specifiers[0].local.name
+                // path.node.specifiers[0].imported.name
+                if (path.node.source.value !== "ts-optchain") {
+                    return;
+                }
+
+                for (const s of path.node.specifiers) {
+                    if (!t.isImportSpecifier(s)) {
+                        continue;
+                    }
+
+                    if (s.imported.name === "oc") {
+                        name = s.local.name;
+                    }
+                }
+            },
+
             CallExpression(path) {
-                if (!t.isIdentifier(path.node.callee, {name: "oc"})) {
+                if (!t.isIdentifier(path.node.callee, {name: name})) {
                     return;
                 }
 

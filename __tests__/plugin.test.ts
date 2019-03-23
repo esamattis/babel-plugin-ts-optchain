@@ -51,3 +51,16 @@ test("can handle complicated expressions in default values", async () => {
     oc(data, ["foo", "bar", "baz", "last"], something ? getDefault() : other());
     `);
 });
+
+test("can use local import alias", async () => {
+    const code = dedent`
+    import { oc as custom } from "ts-optchain";
+    custom(data).foo.bar.baz.last();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc as custom } from "ts-optchain";
+    custom(data, ["foo", "bar", "baz", "last"]);
+    `);
+});
