@@ -101,14 +101,14 @@ export default function(babel: {
                 }
 
                 const {
-                    properties: memberPath,
+                    properties,
                     startPath,
                     defaultValue,
                 } = getMemberExpressionPath(t, path);
 
                 const callArgs = [
                     path.node.arguments[0],
-                    t.arrayExpression(memberPath),
+                    t.arrayExpression(properties),
                 ];
 
                 if (defaultValue) {
