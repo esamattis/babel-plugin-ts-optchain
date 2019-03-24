@@ -1,8 +1,7 @@
 {
     "name": "babel-plugin-ts-optchain",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "",
-    "main": "index.js",
     "main": "lib/plugin.js",
     "types": "lib/plugin.d.ts",
     "repository": {
