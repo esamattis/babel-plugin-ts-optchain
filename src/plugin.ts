@@ -3,6 +3,13 @@ import {Visitor, NodePath} from "@babel/traverse";
 
 type CallValue = types.CallExpression["arguments"][0];
 
+interface PluginOptions {
+    opts: {
+        target?: string;
+        runtime?: string;
+    };
+}
+
 function getMemberExpressionPath(
     t: typeof types,
     path: NodePath,
@@ -46,19 +53,25 @@ function getMemberExpressionPath(
     );
 }
 
-export default function(babel: {types: typeof types}): Record<string, Visitor> {
+export default function(babel: {
+    types: typeof types;
+}): Record<string, Visitor<PluginOptions>> {
     const t = babel.types;
 
     let name: string | null = null;
 
     return {
         visitor: {
-            ImportDeclaration(path) {
-                if (path.node.source.value !== "ts-optchain") {
+            ImportDeclaration(path, state) {
+                const target = state.opts.target || "ts-optchain";
+
+                if (path.node.source.value !== target) {
                     return;
                 }
 
-                path.node.source.value = "babel-plugin-ts-optchain/lib/runtime";
+                path.node.source.value =
+                    state.opts.runtime ||
+                    "babel-plugin-ts-optchain/lib/runtime";
 
                 for (const s of path.node.specifiers) {
                     if (!t.isImportSpecifier(s)) {
