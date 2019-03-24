@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "compile-upstream-tests": "ts-node tools/compile-upstream-tests.ts > __tests__/upstream-ts-optchain.test.js",
+        "build": "tsc --project tsconfig.build.json && rm -rf lib && mv build/src lib && rm -rf build",
         "test": "npm run compile-upstream-tests && jest"
     },
     "author": "",
