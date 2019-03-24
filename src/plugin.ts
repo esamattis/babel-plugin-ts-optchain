@@ -6,9 +6,9 @@ type CallValue = types.CallExpression["arguments"][0];
 function getMemberExpressionPath(
     t: typeof types,
     path: NodePath,
-    properties?: (string | number)[],
+    properties?: types.Expression[],
 ): {
-    properties: (string | number)[];
+    properties: types.Expression[];
     startPath: NodePath;
     defaultValue?: CallValue;
 } {
@@ -30,23 +30,20 @@ function getMemberExpressionPath(
         };
     }
 
-    let key: string | number;
-
     const prop = path.container.property;
+    let expression: types.Expression;
 
     if (path.container.computed) {
-        if (t.isNumericLiteral(prop) || t.isStringLiteral(prop)) {
-            key = prop.value;
-        } else {
-            throw new Error(
-                "Cannot path accessor key. This is a bug in babel-plugin-ts-optchain",
-            );
-        }
+        expression = prop;
     } else {
-        key = path.container.property.name;
+        expression = t.stringLiteral(prop.name);
     }
 
-    return getMemberExpressionPath(t, path.parentPath, properties.concat(key));
+    return getMemberExpressionPath(
+        t,
+        path.parentPath,
+        properties.concat(expression),
+    );
 }
 
 export default function(babel: {types: typeof types}): Record<string, Visitor> {
@@ -98,14 +95,7 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
 
                 const callArgs = [
                     path.node.arguments[0],
-                    t.arrayExpression(
-                        memberPath.map(key => {
-                            if (typeof key === "number") {
-                                return t.numericLiteral(key);
-                            }
-                            return t.stringLiteral(key);
-                        }),
-                    ),
+                    t.arrayExpression(memberPath),
                 ];
 
                 if (defaultValue) {

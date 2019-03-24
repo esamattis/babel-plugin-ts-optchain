@@ -101,3 +101,29 @@ test("can handle string literal access", async () => {
     oc(data, ["foo", "bar", "ding", "baz", "last"]);
     `);
 });
+
+test("can handle variable accessor", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar[dong].baz.last();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+    oc(data, ["foo", "bar", dong, "baz", "last"]);
+    `);
+});
+
+test("can handle function in accessor", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar[fun(1)].baz.last();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+    oc(data, ["foo", "bar", fun(1), "baz", "last"]);
+    `);
+});
