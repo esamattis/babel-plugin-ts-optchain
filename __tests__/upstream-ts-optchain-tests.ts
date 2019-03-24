@@ -17,7 +17,7 @@ describe("ts-optchain", () => {
             e: {f: boolean} | null;
         }
 
-        const x = oc<X>({
+        const x: X = {
             a: "hello",
             b: {
                 d: "world",
@@ -25,19 +25,19 @@ describe("ts-optchain", () => {
             c: [-100, 200, -300],
             d: null,
             e: {f: false},
-        });
+        };
 
-        expect(x.a()).toEqual("hello");
-        expect(x.b.d()).toEqual("world");
-        expect(x.c[0]()).toEqual(-100);
-        expect(x.c[100]()).toBeUndefined();
-        expect(x.c[100](1234)).toEqual(1234);
-        expect(x.d.e()).toBeUndefined();
-        expect(x.d.e("optional default value")).toEqual(
+        expect(oc(x).a()).toEqual("hello");
+        expect(oc(x).b.d()).toEqual("world");
+        expect(oc(x).c[0]()).toEqual(-100);
+        expect(oc(x).c[100]()).toBeUndefined();
+        expect(oc(x).c[100](1234)).toEqual(1234);
+        expect(oc(x).d.e()).toBeUndefined();
+        expect(oc(x).d.e("optional default value")).toEqual(
             "optional default value",
         );
-        expect(x.e.f()).toEqual(false);
-        expect((x as any).y.z.a.b.c.d.e.f.g.h.i.j.k()).toBeUndefined();
+        expect(oc(x).e.f()).toEqual(false);
+        expect(oc(x as any).y.z.a.b.c.d.e.f.g.h.i.j.k()).toBeUndefined();
     });
 
     it("optional chaining equivalence", () => {
