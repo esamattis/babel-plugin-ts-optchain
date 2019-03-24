@@ -32,5 +32,20 @@ and add it to your `.babelrc` with `@babel/preset-typescript`
 }
 ```
 
+## Limitations
+
+You must call `oc()` in a single chain. Eg. this does not work:
+
+```ts
+const x = oc(data);
+const bar = x.foo.bar();
+```
+
+Write it like this
+
+```ts
+const bar = oc(data).foo.bar();
+```
+
 [ts-optchain]: https://github.com/rimeto/ts-optchain
 [mb]: https://github.com/burakcan/mb
