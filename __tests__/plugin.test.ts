@@ -127,3 +127,16 @@ test("can handle function in accessor", async () => {
     oc(data, ["foo", "bar", fun(1), "baz", "last"]);
     `);
 });
+
+test("can handle function in accessor in the leaf getter", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar.baz[last(1)]();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+    oc(data, ["foo", "bar", "baz", last(1)]);
+    `);
+});
