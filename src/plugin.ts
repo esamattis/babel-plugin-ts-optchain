@@ -28,6 +28,17 @@ function getMemberExpressionPath(
 
         if (t.isCallExpression(path.parent)) {
             defaultValue = path.parent.arguments[0];
+        } else {
+            if (t.isMemberExpression(path.node)) {
+                throw new Error(
+                    "Last property accessor in ts-optchain must be a function call. " +
+                        `Add () to .${path.node.property.name};`,
+                );
+            } else {
+                throw new Error(
+                    "You must add at least one property accessor to oc() calls",
+                );
+            }
         }
 
         return {

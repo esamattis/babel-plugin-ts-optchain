@@ -140,3 +140,27 @@ test("can handle function in accessor in the leaf getter", async () => {
     oc(data, ["foo", "bar", "baz", last(1)]);
     `);
 });
+
+test("has good error message when chain does not end with function call", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    const foo = oc(data).foo;
+    const bar = foo.bar();
+    `;
+
+    expect(() => {
+        runPlugin(code);
+    }).toThrow("Last property accessor in ts-optchain must be a function call");
+});
+
+test("has good error message when there are no property accessors at all", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    const x = oc(data);
+    const bar = x.bar();
+    `;
+
+    expect(() => {
+        runPlugin(code);
+    }).toThrow("You must add at least one property accessor to oc() calls");
+});
