@@ -1,29 +1,32 @@
-import {transformFileSync} from "@babel/core";
+import {transformFileSync, transform} from "@babel/core";
+import fs from "fs";
 
 function main() {
-    const res = transformFileSync(
-        "__tests__/upstream-ts-optchain-tests-source.ts",
-        {
-            presets: [
-                "@babel/preset-typescript",
-                [
-                    "@babel/preset-env",
-                    {
-                        targets: {node: "current"},
-                    },
-                ],
+    const source = fs
+        .readFileSync("__tests__/upstream-ts-optchain-tests.source")
+        .toString();
+    const res = transform(source, {
+        babelrc: false,
+        filename: "test.ts",
+        presets: [
+            "@babel/preset-typescript",
+            [
+                "@babel/preset-env",
+                {
+                    targets: {node: "current"},
+                },
             ],
-            plugins: [
-                [
-                    __dirname + "/../src/plugin.ts",
-                    {
-                        target: "../index",
-                        runtime: "../src/runtime",
-                    },
-                ],
+        ],
+        plugins: [
+            [
+                __dirname + "/../src/plugin.ts",
+                {
+                    target: "../index",
+                    runtime: "../src/runtime",
+                },
             ],
-        },
-    );
+        ],
+    });
 
     if (!res) {
         throw new Error("plugin failed");
