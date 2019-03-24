@@ -38,7 +38,9 @@ function getMemberExpressionPath(
         if (t.isNumericLiteral(prop) || t.isStringLiteral(prop)) {
             key = prop.value;
         } else {
-            throw new Error("Cannot find key");
+            throw new Error(
+                "Cannot path accessor key. This is a bug in babel-plugin-ts-optchain",
+            );
         }
     } else {
         key = path.container.property.name;
