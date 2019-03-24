@@ -45,6 +45,8 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
                     return;
                 }
 
+                path.node.source.value = "babel-plugin-ts-optchain/lib/runtime";
+
                 for (const s of path.node.specifiers) {
                     if (!t.isImportSpecifier(s)) {
                         continue;

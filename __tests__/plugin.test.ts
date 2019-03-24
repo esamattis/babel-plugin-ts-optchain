@@ -21,7 +21,7 @@ test("can transform property access to oc call", async () => {
 
     const res = runPlugin(code);
     expect(res.code).toEqual(dedent`
-    import { oc } from "ts-optchain";
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
     oc(data, ["foo", "bar", "baz", "last"]);
     `);
 });
@@ -34,7 +34,7 @@ test("can pass the default value", async () => {
 
     const res = runPlugin(code);
     expect(res.code).toEqual(dedent`
-    import { oc } from "ts-optchain";
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
     oc(data, ["foo", "bar", "baz", "last"], "default");
     `);
 });
@@ -47,7 +47,7 @@ test("can handle complicated expressions in default values", async () => {
 
     const res = runPlugin(code);
     expect(res.code).toEqual(dedent`
-    import { oc } from "ts-optchain";
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
     oc(data, ["foo", "bar", "baz", "last"], something ? getDefault() : other());
     `);
 });
@@ -60,7 +60,7 @@ test("can use local import alias", async () => {
 
     const res = runPlugin(code);
     expect(res.code).toEqual(dedent`
-    import { oc as custom } from "ts-optchain";
+    import { oc as custom } from "babel-plugin-ts-optchain/lib/runtime";
     custom(data, ["foo", "bar", "baz", "last"]);
     `);
 });
