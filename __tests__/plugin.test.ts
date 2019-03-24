@@ -88,3 +88,16 @@ test("can handle array access", async () => {
     oc(data, ["foo", "bar", 0, "baz", "last"]);
     `);
 });
+
+test("can handle string literal access", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar["ding"].baz.last();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+    oc(data, ["foo", "bar", "ding", "baz", "last"]);
+    `);
+});

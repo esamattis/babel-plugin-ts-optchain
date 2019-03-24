@@ -32,9 +32,11 @@ function getMemberExpressionPath(
 
     let key: string | number;
 
+    const prop = path.container.property;
+
     if (path.container.computed) {
-        if (t.isNumericLiteral(path.container.property)) {
-            key = path.container.property.value;
+        if (t.isNumericLiteral(prop) || t.isStringLiteral(prop)) {
+            key = prop.value;
         } else {
             throw new Error("Cannot find key");
         }
