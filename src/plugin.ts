@@ -6,8 +6,12 @@ type CallValue = types.CallExpression["arguments"][0];
 function getMemberExpressionPath(
     t: typeof types,
     path: NodePath,
-    properties?: string[],
-): {properties: string[]; startPath: NodePath; defaultValue?: CallValue} {
+    properties?: (string | number)[],
+): {
+    properties: (string | number)[];
+    startPath: NodePath;
+    defaultValue?: CallValue;
+} {
     if (!properties) {
         properties = [];
     }
@@ -26,11 +30,19 @@ function getMemberExpressionPath(
         };
     }
 
-    return getMemberExpressionPath(
-        t,
-        path.parentPath,
-        properties.concat(path.container.property.name),
-    );
+    let key: string | number;
+
+    if (path.container.computed) {
+        if (t.isNumericLiteral(path.container.property)) {
+            key = path.container.property.value;
+        } else {
+            throw new Error("Cannot find key");
+        }
+    } else {
+        key = path.container.property.name;
+    }
+
+    return getMemberExpressionPath(t, path.parentPath, properties.concat(key));
 }
 
 export default function(babel: {types: typeof types}): Record<string, Visitor> {
@@ -82,7 +94,14 @@ export default function(babel: {types: typeof types}): Record<string, Visitor> {
 
                 const callArgs = [
                     path.node.arguments[0],
-                    t.arrayExpression(memberPath.map(p => t.stringLiteral(p))),
+                    t.arrayExpression(
+                        memberPath.map(key => {
+                            if (typeof key === "number") {
+                                return t.numericLiteral(key);
+                            }
+                            return t.stringLiteral(key);
+                        }),
+                    ),
                 ];
 
                 if (defaultValue) {

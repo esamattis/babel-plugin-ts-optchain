@@ -75,3 +75,16 @@ test("does not touch oc() calls if they are not imported from ts-optchain", asyn
     oc(data).foo.bar.baz.last();
     `);
 });
+
+test("can handle array access", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar[0].baz.last();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+    oc(data, ["foo", "bar", 0, "baz", "last"]);
+    `);
+});
