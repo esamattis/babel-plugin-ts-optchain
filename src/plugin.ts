@@ -47,7 +47,7 @@ function getMemberExpressionPath(
 }
 
 export default function(babel: {types: typeof types}): Record<string, Visitor> {
-    const {types: t} = babel;
+    const t = babel.types;
 
     let name: string | null = null;
 
