@@ -1,7 +1,7 @@
-import * as types from "@babel/types";
+import * as BabelTypes from "@babel/types";
 import {Visitor, NodePath} from "@babel/traverse";
 
-type CallValue = types.CallExpression["arguments"][0];
+type CallValue = BabelTypes.CallExpression["arguments"][0];
 
 interface PluginOptions {
     opts: {
@@ -10,17 +10,17 @@ interface PluginOptions {
     };
 }
 
-function getMemberExpressionPath(
-    t: typeof types,
+function getAccessorExpressionPath(
+    t: typeof BabelTypes,
     path: NodePath,
-    properties?: types.Expression[],
+    accessorExpressionPath?: BabelTypes.Expression[],
 ): {
-    properties: types.Expression[];
-    startPath: NodePath;
+    accessorExpressionPath: BabelTypes.Expression[];
+    endNodePath: NodePath;
     defaultValue?: CallValue;
 } {
-    if (!properties) {
-        properties = [];
+    if (!accessorExpressionPath) {
+        accessorExpressionPath = [];
     }
 
     if (!t.isMemberExpression(path.container)) {
@@ -42,33 +42,40 @@ function getMemberExpressionPath(
         }
 
         return {
-            properties: properties,
-            startPath: path.parentPath,
+            accessorExpressionPath,
+            endNodePath: path.parentPath,
             defaultValue: defaultValue,
         };
     }
 
     const prop = path.container.property;
-    let expression: types.Expression;
+    let expression: BabelTypes.Expression;
 
     if (path.container.computed) {
+        // Pass computed properties as is.
+        // Ex. oc(data)[ding()]() -> ding()
         expression = prop;
     } else {
+        // Convert static property accessors to strings
+        // Ex. oc().foo() -> "foo"
         expression = t.stringLiteral(prop.name);
     }
 
-    return getMemberExpressionPath(
+    return getAccessorExpressionPath(
         t,
         path.parentPath,
-        properties.concat(expression),
+        accessorExpressionPath.concat(expression),
     );
 }
 
 export default function(babel: {
-    types: typeof types;
+    types: typeof BabelTypes;
 }): Record<string, Visitor<PluginOptions>> {
     const t = babel.types;
 
+    /**
+     * Local name of the oc import from ts-optchain if any
+     */
     let name: string | null = null;
 
     return {
@@ -96,37 +103,37 @@ export default function(babel: {
             },
 
             CallExpression(path) {
+                // Disable if no ts-optchain is imported
                 if (!name) {
                     return;
                 }
 
+                // Handle only the oc() calls from the ts-optchain import
                 if (!t.isIdentifier(path.node.callee, {name: name})) {
                     return;
                 }
 
-                // Avoid infinite recursion on already changed nodes
-                if (t.isCallExpression(path.node)) {
-                    if (path.node.arguments.length > 1) {
-                        return;
-                    }
+                // Avoid infinite recursion on already transformed nodes
+                if (path.node.arguments.length > 1) {
+                    return;
                 }
 
                 const {
-                    properties,
-                    startPath,
+                    accessorExpressionPath,
+                    endNodePath,
                     defaultValue,
-                } = getMemberExpressionPath(t, path);
+                } = getAccessorExpressionPath(t, path);
 
                 const callArgs = [
                     path.node.arguments[0],
-                    t.arrayExpression(properties),
+                    t.arrayExpression(accessorExpressionPath),
                 ];
 
                 if (defaultValue) {
                     callArgs.push(defaultValue);
                 }
 
-                startPath.replaceWith(
+                endNodePath.replaceWith(
                     t.callExpression(path.node.callee, callArgs),
                 );
             },
