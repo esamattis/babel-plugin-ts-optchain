@@ -5,6 +5,7 @@ function runPlugin(code: string) {
     const res = transform(code, {
         babelrc: false,
         filename: "test.ts",
+        root: __dirname,
         plugins: ["babel-plugin-macros"],
     });
 
