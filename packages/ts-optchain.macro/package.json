@@ -1,6 +1,6 @@
 {
     "name": "ts-optchain.macro",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "Babel Macro for ts-optchain",
     "main": "lib/macro.js",
     "types": "macro.d.ts",
@@ -22,7 +22,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "babel-plugin-ts-optchain": "^1.1.1",
+        "babel-plugin-ts-optchain": "^1.1.2",
         "ts-optchain": "^0.1.3"
     }
 }
