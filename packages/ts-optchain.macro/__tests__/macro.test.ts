@@ -28,3 +28,18 @@ test("oc can be imported from the macro", async () => {
     oc(data, ["foo", "bar", "baz", "last"]);
     `);
 });
+
+test("macro can convert multiple oc uses", async () => {
+    const code = dedent`
+    import { oc } from  "./__tests__/entry.macro";
+    oc(data).foo.bar.baz.last();
+    oc(data).other.thing();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+    oc(data, ["foo", "bar", "baz", "last"]);
+    oc(data, ["other", "thing"]);
+    `);
+});
