@@ -68,7 +68,7 @@ function getAccessorExpressionPath(
     );
 }
 
-export default function(babel: {
+export default function tsOptChainPlugin(babel: {
     types: typeof BabelTypes;
 }): Record<string, Visitor<PluginOptions>> {
     const t = babel.types;
