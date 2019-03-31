@@ -1,7 +1,11 @@
 {
     "name": "babel-plugin-ts-optchain",
     "version": "1.1.1",
-    "description": "",
+    "description": "Babel Plugin for ts-optchain",
+    "keywords": [
+        "babel-plugin",
+        "typescript"
+    ],
     "main": "lib/plugin.js",
     "types": "lib/plugin.d.ts",
     "files": [

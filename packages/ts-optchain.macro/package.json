@@ -1,9 +1,13 @@
 {
     "name": "ts-optchain.macro",
     "version": "1.1.1",
-    "description": "",
+    "description": "Babel Macro for ts-optchain",
     "main": "lib/macro.js",
     "types": "macro.d.ts",
+    "keywords": [
+        "babel-plugin-macros",
+        "typescript"
+    ],
     "files": [
         "macro.d.ts",
         "lib"
