@@ -1,8 +1,10 @@
 import dedent from "dedent";
-import {transformFileSync, transformSync} from "@babel/core";
+import {transform} from "@babel/core";
 
 function runPlugin(code: string) {
-    const res = transformSync(code, {
+    const res = transform(code, {
+        babelrc: false,
+        filename: "test.ts",
         plugins: [__dirname + "/../src/plugin.ts"],
     });
 
