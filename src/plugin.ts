@@ -3,11 +3,20 @@ import {Visitor, NodePath} from "@babel/traverse";
 
 type CallValue = BabelTypes.CallExpression["arguments"][0];
 
-interface PluginOptions {
-    opts: {
+export const RUNTIME_IMPORT = "babel-plugin-ts-optchain/lib/runtime";
+
+export interface PluginOptions {
+    opts?: {
         target?: string;
         runtime?: string;
     };
+    file: {
+        path: NodePath;
+    };
+}
+
+export interface Babel {
+    types: typeof BabelTypes;
 }
 
 function getAccessorExpressionPath(
@@ -68,9 +77,36 @@ function getAccessorExpressionPath(
     );
 }
 
-export default function tsOptChainPlugin(babel: {
-    types: typeof BabelTypes;
-}): Record<string, Visitor<PluginOptions>> {
+export function transformOptchainCall(
+    t: Babel["types"],
+    path: NodePath<BabelTypes.CallExpression>,
+) {
+    // Avoid infinite recursion on already transformed nodes
+    if (path.node.arguments.length > 1) {
+        return;
+    }
+
+    const {
+        accessorExpressionPath,
+        endNodePath,
+        defaultValue,
+    } = getAccessorExpressionPath(t, path);
+
+    const callArgs = [
+        path.node.arguments[0],
+        t.arrayExpression(accessorExpressionPath),
+    ];
+
+    if (defaultValue) {
+        callArgs.push(defaultValue);
+    }
+
+    endNodePath.replaceWith(t.callExpression(path.node.callee, callArgs));
+}
+
+export default function tsOptChainPlugin(
+    babel: Babel,
+): {visitor: Visitor<PluginOptions>} {
     const t = babel.types;
 
     /**
@@ -81,15 +117,16 @@ export default function tsOptChainPlugin(babel: {
     return {
         visitor: {
             ImportDeclaration(path, state) {
-                const target = state.opts.target || "ts-optchain";
+                state = state || {};
+                const opts = state.opts || {};
+
+                const target = opts.target || "ts-optchain";
 
                 if (path.node.source.value !== target) {
                     return;
                 }
 
-                path.node.source.value =
-                    state.opts.runtime ||
-                    "babel-plugin-ts-optchain/lib/runtime";
+                path.node.source.value = opts.runtime || RUNTIME_IMPORT;
 
                 for (const s of path.node.specifiers) {
                     if (!t.isImportSpecifier(s)) {
@@ -113,29 +150,7 @@ export default function tsOptChainPlugin(babel: {
                     return;
                 }
 
-                // Avoid infinite recursion on already transformed nodes
-                if (path.node.arguments.length > 1) {
-                    return;
-                }
-
-                const {
-                    accessorExpressionPath,
-                    endNodePath,
-                    defaultValue,
-                } = getAccessorExpressionPath(t, path);
-
-                const callArgs = [
-                    path.node.arguments[0],
-                    t.arrayExpression(accessorExpressionPath),
-                ];
-
-                if (defaultValue) {
-                    callArgs.push(defaultValue);
-                }
-
-                endNodePath.replaceWith(
-                    t.callExpression(path.node.callee, callArgs),
-                );
+                transformOptchainCall(t, path);
             },
         },
     };
