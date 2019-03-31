@@ -6,7 +6,7 @@ import {
     Babel,
     transformOptchainCall,
     RUNTIME_IMPORT,
-} from "./plugin";
+} from "babel-plugin-ts-optchain";
 
 const {createMacro} = require("babel-plugin-macros");
 

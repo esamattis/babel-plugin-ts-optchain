@@ -1,34 +1,22 @@
 {
-    "name": "babel-plugin-ts-optchain",
-    "version": "1.0.3",
-    "description": "",
-    "main": "lib/plugin.js",
-    "types": "lib/plugin.d.ts",
-    "repository": {
-        "url": "https://github.com/epeli/babel-plugin-ts-optchain"
-    },
-    "scripts": {
-        "compile-upstream-tests": "ts-node tools/compile-upstream-tests.ts > __tests__/upstream-ts-optchain.test.js",
-        "build": "tsc --project tsconfig.build.json && rm -rf lib && mv build/src lib && rm -rf build",
-        "test": "npm run compile-upstream-tests && jest"
-    },
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {
-        "@babel/core": "^7.4.0",
-        "@babel/preset-env": "^7.4.2",
-        "@babel/preset-typescript": "^7.3.3",
-        "@babel/traverse": "^7.4.0",
-        "@babel/types": "^7.4.0",
-        "@types/babel__traverse": "^7.0.6",
-        "@types/dedent": "^0.7.0",
-        "@types/jest": "^24.0.11",
-        "babel-plugin-macros": "^2.5.1",
-        "dedent": "^0.7.0",
-        "jest": "^24.5.0",
-        "prettier": "^1.16.4",
-        "ts-jest": "^24.0.1",
-        "ts-node": "^8.0.3",
-        "typescript": "^3.4.1"
-    }
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^3.13.1",
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
+    "@babel/preset-typescript": "^7.3.3",
+    "@babel/traverse": "^7.4.0",
+    "@babel/types": "^7.4.0",
+    "@types/babel__traverse": "^7.0.6",
+    "@types/dedent": "^0.7.0",
+    "@types/jest": "^24.0.11",
+    "babel-plugin-macros": "^2.5.1",
+    "dedent": "^0.7.0",
+    "jest": "^24.5.0",
+    "prettier": "^1.16.4",
+    "ts-jest": "^24.0.1",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.1"
+  }
 }

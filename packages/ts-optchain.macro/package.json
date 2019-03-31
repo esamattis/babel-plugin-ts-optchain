@@ -1,0 +1,24 @@
+{
+    "name": "ts-optchain.macro",
+    "version": "1.0.3",
+    "description": "",
+    "main": "lib/macro.js",
+    "types": "macro.d.ts",
+    "files": [
+        "macro.d.ts",
+        "lib"
+    ],
+    "repository": {
+        "url": "https://github.com/epeli/babel-plugin-ts-optchain"
+    },
+    "scripts": {
+        "build": "rm -rf build && tsc --project tsconfig.build.json && rm -rf lib && mv build/src lib && rm -rf build",
+        "test": "jest"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "babel-plugin-ts-optchain": "*",
+        "ts-optchain": "^0.1.3"
+    }
+}

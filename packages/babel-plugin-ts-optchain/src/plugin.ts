@@ -117,7 +117,6 @@ export default function tsOptChainPlugin(
     return {
         visitor: {
             ImportDeclaration(path, state) {
-                state = state || {};
                 const opts = state.opts || {};
 
                 const target = opts.target || "ts-optchain";
