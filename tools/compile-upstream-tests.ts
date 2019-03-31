@@ -1,4 +1,4 @@
-import {transformFileSync, transform} from "@babel/core";
+import {transform} from "@babel/core";
 import fs from "fs";
 
 function main() {
