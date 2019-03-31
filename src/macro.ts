@@ -16,13 +16,17 @@ interface Macro {
     references: Record<string, NodePath[]>;
 }
 
-function transfromMacroImport(t: typeof BabelTypes, path: NodePath) {
-    if (!t.isIdentifier(path.node)) {
+function transfromMacroImport(
+    t: typeof BabelTypes,
+    path: NodePath<BabelTypes.CallExpression>,
+) {
+    if (!t.isIdentifier(path.node.callee)) {
         return;
     }
 
-    const importDecl =
-        path.parentPath.scope.bindings[path.node.name].path.parentPath.node;
+    const name = path.node.callee.name;
+
+    const importDecl = path.scope.bindings[name].path.parentPath.node;
 
     if (t.isImportDeclaration(importDecl)) {
         importDecl.source.value = RUNTIME_IMPORT;
@@ -36,10 +40,11 @@ export default createMacro(function tsOptChainMacro(macro: Macro) {
         const paths = macro.references[key];
         for (const path of paths) {
             if (t.isCallExpression(path.parent)) {
-                transfromMacroImport(t, path);
-                transformOptchainCall(t, path.parentPath as NodePath<
+                const callPath = path.parentPath as NodePath<
                     BabelTypes.CallExpression
-                >);
+                >;
+                transfromMacroImport(t, callPath);
+                transformOptchainCall(t, callPath);
             }
         }
     }
