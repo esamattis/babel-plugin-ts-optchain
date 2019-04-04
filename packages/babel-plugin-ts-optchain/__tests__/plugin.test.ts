@@ -28,6 +28,19 @@ test("can transform property access to oc call", async () => {
     `);
 });
 
+test("can handle undefined literal", async () => {
+    const code = dedent`
+    import { oc } from "ts-optchain";
+    oc(undefined).foo.bar.baz.last();
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+    oc(undefined, ["foo", "bar", "baz", "last"]);
+    `);
+});
+
 test("can pass the default value", async () => {
     const code = dedent`
     import { oc } from "ts-optchain";
