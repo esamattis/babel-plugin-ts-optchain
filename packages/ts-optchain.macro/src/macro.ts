@@ -16,6 +16,24 @@ interface Macro {
     references: Record<string, NodePath[]>;
 }
 
+function findImportDeclaration(
+    t: typeof BabelTypes,
+    name: string,
+    path: NodePath,
+): BabelTypes.ImportDeclaration | undefined {
+    const bindings = path.scope.bindings;
+
+    const binding = bindings[name];
+
+    if (!binding) {
+        return findImportDeclaration(t, name, path.scope.parent.path);
+    }
+
+    if (t.isImportDeclaration(binding.path.parentPath.node)) {
+        return binding.path.parentPath.node;
+    }
+}
+
 function transfromMacroImport(
     t: typeof BabelTypes,
     path: NodePath<BabelTypes.CallExpression>,
@@ -26,9 +44,9 @@ function transfromMacroImport(
 
     const name = path.node.callee.name;
 
-    const importDecl = path.scope.bindings[name].path.parentPath.node;
+    const importDecl = findImportDeclaration(t, name, path);
 
-    if (t.isImportDeclaration(importDecl)) {
+    if (importDecl) {
         importDecl.source.value = RUNTIME_IMPORT;
     }
 }
