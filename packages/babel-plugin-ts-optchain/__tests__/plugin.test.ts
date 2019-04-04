@@ -179,3 +179,36 @@ test("has good error message when there are no property accessors at all", async
         runPlugin(code);
     }).toThrow("You must add at least one property accessor to oc() calls");
 });
+
+test("properly resets the state between source files", async () => {
+    const file1 = dedent`
+    import { oc } from "ts-optchain";
+    oc(data).foo.bar.baz.last();
+    `;
+
+    const file2 = dedent`
+    import { oc } from "notoptchain";
+    oc().foo();
+    `;
+
+    transform(file1, {
+        babelrc: false,
+        filename: "file1.ts",
+        plugins: [__dirname + "/../src/plugin.ts"],
+    });
+
+    const res = transform(file2, {
+        babelrc: false,
+        filename: "file1.ts",
+        plugins: [__dirname + "/../src/plugin.ts"],
+    });
+
+    if (!res) {
+        throw new Error("plugin failed");
+    }
+
+    expect(res.code).toEqual(dedent`
+    import { oc } from "notoptchain";
+    oc().foo();
+    `);
+});

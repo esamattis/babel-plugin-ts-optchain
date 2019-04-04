@@ -116,6 +116,11 @@ export default function tsOptChainPlugin(
 
     return {
         visitor: {
+            Program() {
+                // Reset import name state when entering a new file
+                name = null;
+            },
+
             ImportDeclaration(path, state) {
                 const opts = state.opts || {};
 
