@@ -15,7 +15,7 @@ function runPlugin(code: string) {
     return res;
 }
 
-test("can transform property access to oc call", async () => {
+test("can transform property access to oc call", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar.baz.last();
@@ -28,7 +28,7 @@ test("can transform property access to oc call", async () => {
     `);
 });
 
-test("can handle undefined literal", async () => {
+test("can handle undefined literal", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(undefined).foo.bar.baz.last();
@@ -41,7 +41,7 @@ test("can handle undefined literal", async () => {
     `);
 });
 
-test("can pass the default value", async () => {
+test("can pass the default value", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar.baz.last("default");
@@ -54,7 +54,7 @@ test("can pass the default value", async () => {
     `);
 });
 
-test("can handle complicated expressions in default values", async () => {
+test("can handle complicated expressions in default values", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar.baz.last(something ? getDefault() : other());
@@ -67,7 +67,7 @@ test("can handle complicated expressions in default values", async () => {
     `);
 });
 
-test("can use local import alias", async () => {
+test("can use local import alias", () => {
     const code = dedent`
     import { oc as custom } from "ts-optchain";
     custom(data).foo.bar.baz.last();
@@ -80,7 +80,7 @@ test("can use local import alias", async () => {
     `);
 });
 
-test("does not touch oc() calls if they are not imported from ts-optchain", async () => {
+test("does not touch oc() calls if they are not imported from ts-optchain", () => {
     const code = dedent`
     oc(data).foo.bar.baz.last();
     `;
@@ -91,7 +91,7 @@ test("does not touch oc() calls if they are not imported from ts-optchain", asyn
     `);
 });
 
-test("can handle array access", async () => {
+test("can handle array access", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar[0].baz.last();
@@ -104,7 +104,7 @@ test("can handle array access", async () => {
     `);
 });
 
-test("can handle string literal access", async () => {
+test("can handle string literal access", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar["ding"].baz.last();
@@ -117,7 +117,7 @@ test("can handle string literal access", async () => {
     `);
 });
 
-test("can handle variable accessor", async () => {
+test("can handle variable accessor", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar[dong].baz.last();
@@ -130,7 +130,7 @@ test("can handle variable accessor", async () => {
     `);
 });
 
-test("can handle function in accessor", async () => {
+test("can handle function in accessor", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar[fun(1)].baz.last();
@@ -143,7 +143,7 @@ test("can handle function in accessor", async () => {
     `);
 });
 
-test("can handle function in accessor in the leaf getter", async () => {
+test("can handle function in accessor in the leaf getter", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar.baz[last(1)]();
@@ -156,7 +156,7 @@ test("can handle function in accessor in the leaf getter", async () => {
     `);
 });
 
-test("has good error message when chain does not end with function call", async () => {
+test("has good error message when chain does not end with function call", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     const foo = oc(data).foo;
@@ -168,7 +168,7 @@ test("has good error message when chain does not end with function call", async 
     }).toThrow("Last property accessor in ts-optchain must be a function call");
 });
 
-test("has good error message when there are no property accessors at all", async () => {
+test("has good error message when there are no property accessors at all", () => {
     const code = dedent`
     import { oc } from "ts-optchain";
     const x = oc(data);
@@ -180,7 +180,7 @@ test("has good error message when there are no property accessors at all", async
     }).toThrow("You must add at least one property accessor to oc() calls");
 });
 
-test("properly resets the state between source files", async () => {
+test("properly resets the state between source files", () => {
     const file1 = dedent`
     import { oc } from "ts-optchain";
     oc(data).foo.bar.baz.last();
