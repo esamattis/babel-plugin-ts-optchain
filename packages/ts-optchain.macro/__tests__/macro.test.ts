@@ -43,3 +43,43 @@ test("macro can convert multiple oc uses", async () => {
     oc(data, ["other", "thing"]);
     `);
 });
+
+test("can handle binding from parent scope", async () => {
+    const code = dedent`
+    import { oc } from "./__tests__/entry.macro";
+    function fun(a) {
+      oc(a).b();
+    }
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+
+    function fun(a) {
+      oc(a, ["b"]);
+    }
+    `);
+});
+
+test("can handle binding from parent scope through multiple levels", async () => {
+    const code = dedent`
+    import { oc } from "./__tests__/entry.macro";
+    function fun(a) {
+      function inner() {
+        oc(a).b();
+      }
+    }
+    `;
+
+    const res = runPlugin(code);
+    expect(res.code).toEqual(dedent`
+    import { oc } from "babel-plugin-ts-optchain/lib/runtime";
+
+    function fun(a) {
+      function inner() {
+        oc(a, ["b"]);
+      }
+    }
+    `);
+});
